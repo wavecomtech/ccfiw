@@ -96,7 +96,7 @@ func upsertData() error {
 				Description:      device.Description,
 				FirmwareVersion:  device.Version,
 				IPAddress:        []string{device.IP},
-				MACAddress:       device.MAC,
+				MACAddress:       []string{device.MAC},
 				Manufacturer:     device.Vendor,
 				ModelName:        device.DeviceModel,
 				Name:             device.Name,

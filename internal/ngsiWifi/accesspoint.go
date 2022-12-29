@@ -28,7 +28,7 @@ type WIFIAccessPoint struct {
 	Description         string   `json:"description"`
 	FirmwareVersion     string   `json:"firmwareVersion"`
 	IPAddress           []string `json:"ipAddress"`
-	MACAddress          string   `json:"macAddress"`
+	MACAddress          []string `json:"macAddress"`
 	Manufacturer        string   `json:"manufacturer"`
 	ModelName           string   `json:"modelName"`
 	Name                string   `json:"name"`
