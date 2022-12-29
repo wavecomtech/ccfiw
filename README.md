@@ -57,3 +57,19 @@ To run this project, you will need to add the following environment variables to
 `iotagent.iota_port | default: 8088`
 
 `iotagent.json_port | default: 8185`
+
+## Requirements
+
+- docker
+- docker-compose
+
+## Setup
+ First, make sure you have all the required dependencies installed.
+ Second, edit your docker-compose.yml file in order to setup the credencials and hosts desired.
+ Third, run 
+ ```bash 
+    docker-compose up --build ccfiw
+ ```
+and wait for completion.
+
+Hint: You can run the command above as a cronjob in order to keep data syncd.
