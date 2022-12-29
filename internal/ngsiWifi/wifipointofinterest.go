@@ -336,7 +336,6 @@ func (c *ngsiwifi) ProvisionPOIGroup() error {
 				},
 				"static_attributes": []map[string]interface{}{},
 				"apikey":            c.Client.apikey,
-				"resource":          "/iot/json",
 				"description":       "Provision Group WIFIPointOfInterest",
 				"protocol": []string{
 					"IoTA-JSON",
@@ -352,7 +351,7 @@ func (c *ngsiwifi) ProvisionPOIGroup() error {
 	}
 	fmt.Printf("POST /iot/services | BODY: %v", string(bodyBytes))
 
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("http://%s:%d/iot/services", c.Client.hostname, c.Client.iota_port), bytes.NewReader(bodyBytes))
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://%s:%d/iot/services", c.Client.hostname, c.Client.iota_port), bytes.NewReader(bodyBytes))
 	if err != nil {
 		log.Error("ngsi: provision poi error: %w", err)
 		return err
