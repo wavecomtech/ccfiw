@@ -12,28 +12,29 @@ import (
 )
 
 type WIFIAccessPoint struct {
-	ID                  string   `json:"id"`
-	Type                string   `json:"type"`             //auto-generated
-	TimeInstant         string   `json:"TimeInstant"`      //auto-generated
-	Source              string   `json:"source"`           //auto-generated
-	APState             string   `json:"apState"`          //auto-generated
-	APStateSource       string   `json:"apStateSource"`    //auto-generated
-	APStateSourceUpdtAt string   `json:"apStateUpdatedAt"` //auto-generated
-	IsOK                bool     `json:"-"`
-	AreaServed          string   `json:"areaServed"`
-	ConnectionType      string   `json:"connectionType"` //auto-generated
-	DataProvider        string   `json:"dataProvider"`   //auto-generated
-	DateInstalled       string   `json:"dateInstalled,omitempty"`
-	DateLastReboot      string   `json:"dateLastReboot,omitempty"`
-	Description         string   `json:"description"`
-	FirmwareVersion     string   `json:"firmwareVersion"`
-	IPAddress           []string `json:"ipAddress"`
-	MACAddress          []string `json:"macAddress"`
-	Manufacturer        string   `json:"manufacturer"`
-	ModelName           string   `json:"modelName"`
-	Name                string   `json:"name"`
-	PoiId               string   `json:"poiId"`
-	Provider            string   `json:"provider"` //auto-generated
+	ID                    string   `json:"id"`
+	Type                  string   `json:"type"`             //auto-generated
+	TimeInstant           string   `json:"TimeInstant"`      //auto-generated
+	Source                string   `json:"source"`           //auto-generated
+	APState               string   `json:"apState"`          //auto-generated
+	APStateSource         string   `json:"apStateSource"`    //auto-generated
+	APStateSourceUpdtAt   string   `json:"apStateUpdatedAt"` //auto-generated
+	IsOK                  bool     `json:"-"`
+	AreaServed            string   `json:"areaServed"`
+	ConnectionType        string   `json:"connectionType"` //auto-generated
+	DataProvider          string   `json:"dataProvider"`   //auto-generated
+	DateInstalled         string   `json:"dateInstalled,omitempty"`
+	DateLastReboot        string   `json:"dateLastReboot,omitempty"`
+	DateLastValueReported string   `json:"dateLastValueReported,omitempty"`
+	Description           string   `json:"description"`
+	FirmwareVersion       string   `json:"firmwareVersion"`
+	IPAddress             []string `json:"ipAddress"`
+	MACAddress            []string `json:"macAddress"`
+	Manufacturer          string   `json:"manufacturer"`
+	ModelName             string   `json:"modelName"`
+	Name                  string   `json:"name"`
+	PoiId                 string   `json:"poiId"`
+	Provider              string   `json:"provider"` //auto-generated
 	// total Users online
 	ClientsConnected       int    `json:"clientsConnected"`
 	ClientsConnectedSource string `json:"clientsConnectedSource"`    //auto-generated
@@ -57,6 +58,7 @@ func (wa *WIFIAccessPoint) Validate(source string) error {
 	wa.TimeInstant = time
 	wa.APStateSourceUpdtAt = time
 	wa.ClientsConnectedUpdAT = time
+	wa.DateLastValueReported = time
 
 	// fill state
 	if wa.IsOK {
