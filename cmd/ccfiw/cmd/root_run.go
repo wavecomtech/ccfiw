@@ -71,6 +71,7 @@ func upsertData() error {
 			Latitude:               site.Latitude,
 			Longitude:              site.Longitude,
 			Category:               site.Type,
+			Service:                site.Tag,
 			Description:            site.Description,
 			NrOfAPs:                site.DeviceMeta.Total,
 			NrOfAPsOK:              site.DeviceMeta.OK,

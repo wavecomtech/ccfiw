@@ -26,6 +26,7 @@ type WIFIPointOfInterest struct {
 	// } `json:"location"` // auto-generated
 	Type         string   `json:"type"` // auto-generated
 	Category     []string `json:"category"`
+	Service      []string `json:"service"`
 	Address      string   `json:"address"`
 	Email        string   `json:"contactPoint"`
 	DataProvider string   `json:"dataProvider"` //auto-generated

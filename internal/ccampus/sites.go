@@ -62,6 +62,7 @@ type Site struct {
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
 	Type        []string `json:"type"`
+	Tag         []string `json:"tag"`
 	Latitude    string   `json:"latitude"`
 	Longitude   string   `json:"longitude"`
 	Address     string   `json:"address"`
