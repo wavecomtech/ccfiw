@@ -7,6 +7,16 @@ networks:
   wn-net:
 
 services:
+  redis:
+    image: redis:7-alpine
+    networks:
+      - kong-net
+      - lora-net
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redisdata:/data
+
   ccfiw:
     build:
       context: .
@@ -19,6 +29,8 @@ services:
       # - CCAMPUS__WORKERSSID=Corp
       # - CCAMPUS__PASSWORD=XXXXXXXX
       # - CCAMPUS__USERNAME=XXXXXXXXX
+      - REDIS__SERVER=redis:6379
+      - REDIS__DATABASE=0
       - GENERAL__LOG_LEVEL=1
   # Orion is the context broker
   # orion:
