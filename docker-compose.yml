@@ -20,6 +20,8 @@ services:
   ccfiw:
     build:
       context: .
+    depends_on:
+      - redis
     environment:
       # - IOTAGENT__APIKEY=XXXXXXXXXXXXX
       # - IDM__PASSWORD=XXXXXXXX
