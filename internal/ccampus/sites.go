@@ -1,6 +1,8 @@
 package ccampus
 
 import (
+	"ccfiw/internal/cache"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,8 +14,11 @@ import (
 )
 
 type DStatsData struct {
-	SSID string `json:"ssid"`
-	RSSI int    `json:"rssi"`
+	SSID     string `json:"ssid"`
+	RSSI     int    `json:"rssi"`
+	MAC      string `json:"terminalMac"`
+	IP       string `json:"terminalIP"`
+	Hostname string `json:"hostName"`
 }
 
 type DeviceStats struct {
@@ -53,6 +58,9 @@ type DeviceMeta struct {
 	TotalGoodQuality   int
 	TotalMediumQuality int
 	TotalPoorQuality   int
+	CurHourUsers       int64
+	CurHourWorkers     int64
+	CurHourCitizens    int64
 }
 
 // Site is a CloudCampus Site
@@ -62,6 +70,7 @@ type Site struct {
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
 	Type        []string `json:"type"`
+	Tag         []string `json:"tag"`
 	Latitude    string   `json:"latitude"`
 	Longitude   string   `json:"longitude"`
 	Address     string   `json:"address"`
@@ -84,11 +93,9 @@ func (sm *SiteMeta) updateData(client *Client) error {
 		if err := sm.Sites[i].getDeviceData(client); err != nil {
 			return err
 		}
-		fmt.Println("-----")
 
 		for j, dev := range sm.Sites[i].DeviceMeta.Devices {
 			status, err := strconv.Atoi(dev.Status)
-			fmt.Println("status: ", status)
 			if err != nil {
 				return err
 			}
@@ -130,14 +137,16 @@ func (sm *SiteMeta) updateData(client *Client) error {
 				return err
 			}
 		}
-		fmt.Println("OK: ", sm.Sites[i].DeviceMeta.OK)
-		fmt.Println("KO:", sm.Sites[i].DeviceMeta.KO)
-		fmt.Println("TotalUsers:", sm.Sites[i].DeviceMeta.TotalUsers)
-		fmt.Println("TotalCitizens:", sm.Sites[i].DeviceMeta.TotalCitizens)
-		fmt.Println("TotalWorkers:", sm.Sites[i].DeviceMeta.TotalWorkers)
+		log.WithFields(log.Fields{
+			"OK":                 sm.Sites[i].DeviceMeta.OK,
+			"KO":                 sm.Sites[i].DeviceMeta.KO,
+			"TotalUsers":         sm.Sites[i].DeviceMeta.TotalUsers,
+			"TotalGoodQuality":   sm.Sites[i].DeviceMeta.TotalGoodQuality,
+			"TotalMediumQuality": sm.Sites[i].DeviceMeta.TotalMediumQuality,
+			"TotalPoorQuality":   sm.Sites[i].DeviceMeta.TotalPoorQuality,
+			"CurHourUsers":       sm.Sites[i].DeviceMeta.CurHourUsers,
+		}).Debugf("DeviceMeta for %s", sm.Sites[i].ID)
 	}
-
-	fmt.Println(sm.Sites[0])
 
 	return nil
 }
@@ -213,15 +222,28 @@ func (s *Site) getDeviceData(client *Client) error {
 
 func (s *Site) getDeviceStats(client *Client, devidx int) error {
 	devid := s.DeviceMeta.Devices[devidx].ID
+	usersCacheKey := cache.GenKey(s.ID, "users")
+	citizensCacheKey := cache.GenKey(s.ID, "citizens")
+	workersCacheKey := cache.GenKey(s.ID, "workers")
 	pageSize := 100
 	pageIdx := 1
+	pipe := cache.RedisClient.Pipeline()
+	tmpMacs := struct {
+		Users    []interface{}
+		Citizens []interface{}
+		Workers  []interface{}
+	}{[]interface{}{}, []interface{}{}, []interface{}{}}
+
 	for {
 		stats, err := requestStationStats(client, devid, pageIdx, pageSize)
 		if err != nil {
 			return err
 		}
+
 		//s.DeviceMeta.Devices[devidx].Stats.Data = append(s.DeviceMeta.Devices[devidx].Stats.Data, stats.Data...)
 		for _, st := range stats.Data {
+			// MAC is anonymized so we need to combine with other info
+			terminalid := fmt.Sprintf("%s%s%s", st.MAC, st.IP, st.Hostname)
 			isWorkerSSID := false
 			for _, wssid := range client.WorkerSSIDS {
 				if st.SSID == wssid {
@@ -232,9 +254,11 @@ func (s *Site) getDeviceStats(client *Client, devidx int) error {
 			if isWorkerSSID {
 				s.DeviceMeta.Devices[devidx].Stats.TotalWorkers++
 				s.DeviceMeta.TotalWorkers++
+				tmpMacs.Workers = append(tmpMacs.Workers, terminalid)
 			} else {
 				s.DeviceMeta.Devices[devidx].Stats.TotalCitizens++
 				s.DeviceMeta.TotalCitizens++
+				tmpMacs.Citizens = append(tmpMacs.Citizens, terminalid)
 
 			}
 
@@ -254,15 +278,56 @@ func (s *Site) getDeviceStats(client *Client, devidx int) error {
 			s.DeviceMeta.TotalUsers++
 
 		}
+
 		if stats.Total <= pageIdx*pageSize {
 			break
 		}
 		pageIdx++
 	}
-	// fmt.Printf("device %s | total users: %d citizens: %d workers: %d\n", devid,
-	// 	s.DeviceMeta.Devices[devidx].Stats.Total,
-	// 	s.DeviceMeta.Devices[devidx].Stats.TotalCitizens,
-	// 	s.DeviceMeta.Devices[devidx].Stats.TotalWorkers)
+
+	tmpMacs.Users = append(tmpMacs.Users, tmpMacs.Citizens...)
+	tmpMacs.Users = append(tmpMacs.Users, tmpMacs.Workers...)
+
+	cache.SMAdd(pipe, citizensCacheKey, tmpMacs.Citizens)
+	cache.SMAdd(pipe, workersCacheKey, tmpMacs.Workers)
+	cache.SMAdd(pipe, usersCacheKey, tmpMacs.Users)
+	// set keys expire policy
+	err := cache.SetExpiration(pipe, citizensCacheKey)
+	if err != nil {
+		log.Error(err)
+	}
+	err = cache.SetExpiration(pipe, workersCacheKey)
+	if err != nil {
+		log.Error(err)
+	}
+	err = cache.SetExpiration(pipe, usersCacheKey)
+	if err != nil {
+		log.Error(err)
+	}
+	// commit to redis
+	_, err = pipe.Exec(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	// fetch result
+	ml, err := cache.GetMembersLength(usersCacheKey)
+	if err != nil {
+		panic(err)
+	}
+	s.DeviceMeta.CurHourUsers = ml
+
+	ml, err = cache.GetMembersLength(workersCacheKey)
+	if err != nil {
+		panic(err)
+	}
+	s.DeviceMeta.CurHourWorkers = ml
+
+	ml, err = cache.GetMembersLength(citizensCacheKey)
+	if err != nil {
+		panic(err)
+	}
+	s.DeviceMeta.CurHourCitizens = ml
+
 	return nil
 }
 

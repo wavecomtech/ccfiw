@@ -95,6 +95,6 @@ func (t *Client) DeviceExists(id string) bool {
 		log.Errorf("ngsi: get device %s. Does not exist. Status %s", id, resp.Status)
 		return false
 	}
-	log.Infof("ngsi: get device %s. Exists", id)
+	log.Debugf("ngsi: get device %s. Exists", id)
 	return true
 }

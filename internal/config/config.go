@@ -6,6 +6,16 @@ type Config struct {
 		LogLevel int `mapstructure:"log_level"`
 	} `mapstructure:"general"`
 
+	Redis struct {
+		Servers    []string `mapstructure:"servers"`
+		Cluster    bool     `mapstructure:"cluster"`
+		MasterName string   `mapstructure:"master_name"`
+		PoolSize   int      `mapstructure:"pool_size"`
+		Password   string   `mapstructure:"password"`
+		Database   int      `mapstructure:"database"`
+		TLSEnabled bool     `mapstructure:"tls_enabled"`
+	} `mapstructure:"redis"`
+
 	CCAMPUS struct {
 		BasePath   string `mapstructure:"basepath"`
 		Username   string `mapstructure:"username"`
@@ -22,10 +32,12 @@ type Config struct {
 	} `mapstructure:"idm"`
 
 	IoTAgent struct {
-		HostName string `mapstructure:"hostname"`
-		IoTAPort int16  `mapstructure:"iota_port"`
-		JSONPort int16  `mapstructure:"json_port"`
-		APIKey   string `mapstructure:"apikey"`
+		HostName    string `mapstructure:"hostname"`
+		IoTAPort    int16  `mapstructure:"iota_port"`
+		JSONPort    int16  `mapstructure:"json_port"`
+		APIKey      string `mapstructure:"apikey"`
+		ForceUpdate bool   `mapstructure:"force_update"`
+		IgnoreSites string `mapstructure:"ignore_sites"`
 	} `mapstructure:"iotagent"`
 }
 

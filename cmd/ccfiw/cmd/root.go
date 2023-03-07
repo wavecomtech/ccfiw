@@ -35,7 +35,10 @@ func init() {
 	viper.SetDefault("iotagent.hostname", "iota.iotplatform.telefonica.com")
 	viper.SetDefault("iotagent.iota_port", 8088)
 	viper.SetDefault("iotagent.json_port", 8185)
-
+	viper.SetDefault("iotagent.ignore_sites", "")
+	viper.SetDefault("redis.database", 0)
+	viper.SetDefault("redis.servers", "redis:6379")
+	viper.SetDefault("iotagent.force_update", false)
 	rootCmd.AddCommand(versionCmd)
 }
 

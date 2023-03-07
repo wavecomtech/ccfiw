@@ -1,15 +1,25 @@
 version: "3.7"
 
 volumes:
-  mongo-db: ~
+  # mongo-db: ~
+  redisdata: ~
 
 networks:
   wn-net:
 
 services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redisdata:/data
+
   ccfiw:
     build:
       context: .
+    depends_on:
+      - redis
     environment:
       # - IOTAGENT__APIKEY=XXXXXXXXXXXXX
       # - IDM__PASSWORD=XXXXXXXX
@@ -19,7 +29,12 @@ services:
       # - CCAMPUS__WORKERSSID=Corp
       # - CCAMPUS__PASSWORD=XXXXXXXX
       # - CCAMPUS__USERNAME=XXXXXXXXX
-      - GENERAL__LOG_LEVEL=1
+      - REDIS__SERVER=redis:6379
+      - REDIS__DATABASE=0
+      - IOTAGENT__IGNORE_SITES=f5d7d050-e8f1-4040-b1e2-dfd85b469cb2
+      - IOTAGENT__FORCE_UPDATE=false
+
+
   # Orion is the context broker
   # orion:
   #   image: fiware/orion:${ORION_VERSION}

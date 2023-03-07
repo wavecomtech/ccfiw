@@ -77,8 +77,9 @@ func (c *ngsiwifi) UpdateAccessPoint(source string, data WIFIAccessPoint) error 
 	if err != nil {
 		return err
 	}
-	fmt.Println("----AP----")
-	fmt.Println(string(body))
+	log.WithFields(log.Fields{
+		"data": fmt.Sprintf("%+v", data),
+	}).Debugln("----AP----")
 	if !c.Client.DeviceExists(data.ID) {
 		log.Infof("AP device %s does not exists", data.ID)
 		if err := c.RegisterAP(data.ID, data.Name); err != nil {
