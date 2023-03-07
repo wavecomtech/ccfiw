@@ -1,7 +1,8 @@
 version: "3.7"
 
 volumes:
-  mongo-db: ~
+  # mongo-db: ~
+  redisdata: ~
 
 networks:
   wn-net:
@@ -9,9 +10,6 @@ networks:
 services:
   redis:
     image: redis:7-alpine
-    networks:
-      - kong-net
-      - lora-net
     ports:
       - "127.0.0.1:6379:6379"
     volumes:
@@ -33,7 +31,7 @@ services:
       # - CCAMPUS__USERNAME=XXXXXXXXX
       - REDIS__SERVER=redis:6379
       - REDIS__DATABASE=0
-      - GENERAL__LOG_LEVEL=1
+      
   # Orion is the context broker
   # orion:
   #   image: fiware/orion:${ORION_VERSION}
