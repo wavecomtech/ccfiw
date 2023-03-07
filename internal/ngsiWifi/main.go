@@ -8,7 +8,7 @@ import (
 
 type NGSIWifi interface {
 	UpdateAccessPoint(string, WIFIAccessPoint) error
-	UpdatePointOfInterest(string, WIFIPointOfInterest) error
+	UpdatePointOfInterest(string, WIFIPointOfInterest, bool) error
 	Login() error
 	ProvisionPOIGroup() error
 }

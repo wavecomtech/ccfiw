@@ -31,7 +31,10 @@ services:
       # - CCAMPUS__USERNAME=XXXXXXXXX
       - REDIS__SERVER=redis:6379
       - REDIS__DATABASE=0
-      
+      - IOTAGENT__IGNORE_SITES=f5d7d050-e8f1-4040-b1e2-dfd85b469cb2
+      - IOTAGENT__FORCE_UPDATE=false
+
+
   # Orion is the context broker
   # orion:
   #   image: fiware/orion:${ORION_VERSION}
