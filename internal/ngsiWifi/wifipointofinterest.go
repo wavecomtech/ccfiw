@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/mozillazg/go-slugify"
@@ -13,17 +14,17 @@ import (
 )
 
 type WIFIPointOfInterest struct {
-	ID          string   `json:"id"`
-	Source      string   `json:"source"`      //auto-generated
-	TimeInstant string   `json:"TimeInstant"` //auto-generated
-	Name        string   `json:"name"`
-	Latitude    string   `json:"-"`
-	Longitude   string   `json:"-"`
-	Location    []string `json:"location"` // auto-generated
-	// Location    struct {
-	// 	Type        string   `json:"type"`        // auto-generated
-	// 	Coordinates []string `json:"coordinates"` // auto-generated
-	// } `json:"location"` // auto-generated
+	ID          string `json:"id"`
+	Source      string `json:"source"`      //auto-generated
+	TimeInstant string `json:"TimeInstant"` //auto-generated
+	Name        string `json:"name"`
+	Latitude    string `json:"-"`
+	Longitude   string `json:"-"`
+	// Location    []string `json:"location"` // auto-generated
+	Location struct {
+		Type        string    `json:"type"`        // auto-generated
+		Coordinates []float64 `json:"coordinates"` // auto-generated
+	} `json:"location"` // auto-generated
 	Type         string   `json:"type"` // auto-generated
 	Category     []string `json:"category"`
 	Service      []string `json:"service"`
@@ -123,7 +124,20 @@ func (d *WIFIPointOfInterest) Validate(source string) error {
 	}
 
 	// resolve location
-	d.Location = []string{d.Longitude, d.Latitude}
+	// d.Location = []string{d.Longitude, d.Latitude}
+	d.Location.Type = "Point"
+	latf, err := strconv.ParseFloat(d.Latitude, 64)
+	if err != nil {
+		latf = 0
+		log.Warnf("POI [%s] invalid %s latitude, setting 0 ...", d.Name, d.Latitude)
+	}
+	longf, err := strconv.ParseFloat(d.Longitude, 64)
+	if err != nil {
+		longf = 0
+		log.Warnf("POI [%s] invalid %s longitude, setting 0 ...", d.Name, d.Longitude)
+
+	}
+	d.Location.Coordinates = []float64{longf, latf}
 
 	// updated at fields
 	ntime := time.Now()

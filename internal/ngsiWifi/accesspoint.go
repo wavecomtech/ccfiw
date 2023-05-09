@@ -35,6 +35,7 @@ type WIFIAccessPoint struct {
 	Name                  string   `json:"name"`
 	PoiId                 string   `json:"poiId"`
 	Provider              string   `json:"provider"` //auto-generated
+
 	// total Users online
 	ClientsConnected       int    `json:"clientsConnected"`
 	ClientsConnectedSource string `json:"clientsConnectedSource"`    //auto-generated
@@ -315,11 +316,11 @@ func (c *ngsiwifi) RegisterAP(device_id, entity_name string) error {
 						"name":      "district",
 						"type":      "Text",
 					},
-					{
-						"object_id": "municipality",
-						"name":      "municipality",
-						"type":      "Text",
-					},
+					// {
+					// 	"object_id": "municipality",
+					// 	"name":      "municipality",
+					// 	"type":      "Text",
+					// },
 					{
 						"object_id": "province",
 						"name":      "province",
