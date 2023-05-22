@@ -31,6 +31,7 @@ type WIFIPointOfInterest struct {
 	Address      string   `json:"address"`
 	Email        string   `json:"contactPoint"`
 	DataProvider string   `json:"dataProvider"` //auto-generated
+	Municipality string   `json:"municipality"`
 
 	Description string `json:"description"`
 	Zip         string `json:"zip"`
@@ -111,6 +112,10 @@ func (d *WIFIPointOfInterest) Validate(source string) error {
 	d.HrNumberOfUsersConnectedSource = source
 	d.HrNumberOfCitizensConnectedSource = source
 	d.HrNumberOfWorkersConnectedSource = source
+
+	if d.Municipality == "" {
+		d.Municipality = "NA"
+	}
 
 	// resolve wifi status
 	if d.NrOfAPs == 0 {
@@ -276,6 +281,11 @@ func (c *ngsiwifi) ProvisionPOIGroup() error {
 					{
 						"object_id": "zip",
 						"name":      "zip",
+						"type":      "Text",
+					},
+					{
+						"object_id": "municipality",
+						"name":      "municipality",
 						"type":      "Text",
 					},
 					{
