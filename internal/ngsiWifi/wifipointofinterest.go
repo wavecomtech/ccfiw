@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/mozillazg/go-slugify"
@@ -21,17 +20,17 @@ type WIFIPointOfInterest struct {
 	Latitude    string `json:"-"`
 	Longitude   string `json:"-"`
 	// Location    []string `json:"location"` // auto-generated
-	Location struct {
-		Type        string    `json:"type"`        // auto-generated
-		Coordinates []float64 `json:"coordinates"` // auto-generated
-	} `json:"location"` // auto-generated
+	// Location struct {
+	// 	Type        string    `json:"type"`        // auto-generated
+	// 	Coordinates []float64 `json:"coordinates"` // auto-generated
+	// } `json:"location"` // auto-generated
 	Type         string   `json:"type"` // auto-generated
 	Category     []string `json:"category"`
 	Service      []string `json:"service"`
 	Address      string   `json:"address"`
 	Email        string   `json:"contactPoint"`
 	DataProvider string   `json:"dataProvider"` //auto-generated
-	Municipality string   `json:"municipality"`
+	// Municipality string   `json:"municipality"`
 
 	Description string `json:"description"`
 	Zip         string `json:"zip"`
@@ -113,9 +112,9 @@ func (d *WIFIPointOfInterest) Validate(source string) error {
 	d.HrNumberOfCitizensConnectedSource = source
 	d.HrNumberOfWorkersConnectedSource = source
 
-	if d.Municipality == "" {
-		d.Municipality = "NA"
-	}
+	// if d.Municipality == "" {
+	// 	d.Municipality = "NA"
+	// }
 
 	// resolve wifi status
 	if d.NrOfAPs == 0 {
@@ -130,19 +129,19 @@ func (d *WIFIPointOfInterest) Validate(source string) error {
 
 	// resolve location
 	// d.Location = []string{d.Longitude, d.Latitude}
-	d.Location.Type = "Point"
-	latf, err := strconv.ParseFloat(d.Latitude, 64)
-	if err != nil {
-		latf = 0
-		log.Warnf("POI [%s] invalid %s latitude, setting 0 ...", d.Name, d.Latitude)
-	}
-	longf, err := strconv.ParseFloat(d.Longitude, 64)
-	if err != nil {
-		longf = 0
-		log.Warnf("POI [%s] invalid %s longitude, setting 0 ...", d.Name, d.Longitude)
+	// d.Location.Type = "Point"
+	// latf, err := strconv.ParseFloat(d.Latitude, 64)
+	// if err != nil {
+	// 	latf = 0
+	// 	log.Warnf("POI [%s] invalid %s latitude, setting 0 ...", d.Name, d.Latitude)
+	// }
+	// longf, err := strconv.ParseFloat(d.Longitude, 64)
+	// if err != nil {
+	// 	longf = 0
+	// 	log.Warnf("POI [%s] invalid %s longitude, setting 0 ...", d.Name, d.Longitude)
 
-	}
-	d.Location.Coordinates = []float64{longf, latf}
+	// }
+	// d.Location.Coordinates = []float64{longf, latf}
 
 	// updated at fields
 	ntime := time.Now()
@@ -243,11 +242,11 @@ func (c *ngsiwifi) ProvisionPOIGroup() error {
 						"name":      "name",
 						"type":      "Text",
 					},
-					{
-						"object_id": "location",
-						"name":      "location",
-						"type":      "geo:json",
-					},
+					// {
+					// 	"object_id": "location",
+					// 	"name":      "location",
+					// 	"type":      "geo:json",
+					// },
 					{
 						"object_id": "category",
 						"name":      "category",
@@ -283,11 +282,11 @@ func (c *ngsiwifi) ProvisionPOIGroup() error {
 						"name":      "zip",
 						"type":      "Text",
 					},
-					{
-						"object_id": "municipality",
-						"name":      "municipality",
-						"type":      "Text",
-					},
+					// {
+					// 	"object_id": "municipality",
+					// 	"name":      "municipality",
+					// 	"type":      "Text",
+					// },
 					{
 						"object_id": "rtNumberOfAPs",
 						"name":      "rtNumberOfAPs",
@@ -516,11 +515,11 @@ func (c *ngsiwifi) RegisterPOI(device_id, entity_name string, force_update bool)
 			"name":      "name",
 			"type":      "Text",
 		},
-		{
-			"object_id": "location",
-			"name":      "location",
-			"type":      "geo:json",
-		},
+		// {
+		// 	"object_id": "location",
+		// 	"name":      "location",
+		// 	"type":      "geo:json",
+		// },
 		{
 			"object_id": "category",
 			"name":      "category",
